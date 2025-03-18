@@ -1,18 +1,27 @@
+import assert from "node:assert";
+
 let obj = {
   test: function (stringArg, stringArg2) {
-    console.log(stringArg, this.name, stringArg2);
+    return stringArg + this.name + stringArg2;
   },
   test2: () => {
-    console.log(this);
+    return this;
   },
 };
 
-obj.test.call({ name: "daniel" });
+let result = obj.test.call({ name: "daniel" });
+assert.strictEqual(result, "undefineddanielundefined");
 
-obj.test.call({ name: "tiago" }, "Olá,", "tudo bem?");
+result = obj.test.call({ name: "tiago" }, "Olá, ", ", tudo bem?");
+assert.strictEqual(result, "Olá, tiago, tudo bem?");
 
-obj.test.apply({ name: "daniel" }, ["Olá,", "tudo bem?"]);
+result = obj.test.apply({ name: "daniel" }, ["Olá, ", ", tudo bem?"]);
+assert.strictEqual(result, "Olá, daniel, tudo bem?");
 
-const newCtxFunc = obj.test.bind({ name: "julia" });
+let newCtxFunc = obj.test.bind({ name: "julia" });
+result = newCtxFunc("Olá, ", ", tudo bem?");
+assert.strictEqual(result, "Olá, julia, tudo bem?");
 
-newCtxFunc("Olá,", "tudo bem?");
+// o this no topo do arquivo de módulo ES é undefined, seria {} se fosse CommonJS, onde o topo é o objeto module.exports
+result = obj.test2();
+assert.strictEqual(result, undefined);
